@@ -38,13 +38,4 @@ class LocalPrototypeTest {
         assertTrue(validateEntry("p","0","0","Tarea breve",today,seconds=5).valid)
         assertFalse(validateEntry("p","24","0","Tarea breve",today,seconds=1).valid)
     }
-    @Test fun csvEscapesQuotesSemicolonsAndSpreadsheetFormulas() {
-        assertEquals("\"'=SUM(A1:A2)\"",csvCell("=SUM(A1:A2)"))
-        assertEquals("\"Tarea; \"\"prueba\"\"\"",csvCell("Tarea; \"prueba\""))
-    }
-    @Test fun csvContainsExactSecondsAndAccountIdentity() {
-        val e=TimeEntry(uid="u",userName="Luis",projectId="p",day=LocalDate.of(2026,10,28),seconds=65,task="Implementar validación")
-        val csv=exportHoursCsv(listOf(e),listOf(Project("p","Portal","Cliente",60,60,0)),"luis@example.test")
-        assertTrue(csv.startsWith("\uFEFFFecha;"));assertTrue(csv.contains("\"65\""));assertTrue(csv.contains("luis@example.test"))
-    }
 }

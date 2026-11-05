@@ -1,7 +1,5 @@
 package com.example.deepsource.ui
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,9 +30,6 @@ import androidx.compose.ui.unit.sp
 import com.example.deepsource.AppViewModel
 import com.example.deepsource.domain.*
 import com.example.deepsource.ui.theme.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -44,10 +38,8 @@ import java.time.format.DateTimeFormatter
     var password by rememberSaveable { mutableStateOf("") }
     var reveal by rememberSaveable { mutableStateOf(false) }
     var submitted by remember { mutableStateOf(false) }
-    var reset by remember { mutableStateOf(false) }
     var demo by remember { mutableStateOf(false) }
     var register by remember {mutableStateOf(false)}
-    val context=LocalContext.current
     val errors = validateLogin(email, password)
     val canSubmit = !vm.busy && email.isNotBlank() && password.isNotBlank()
     Column(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF22183D),Ink,Ink))).statusBarsPadding().navigationBarsPadding().imePadding()
@@ -62,12 +54,11 @@ import java.time.format.DateTimeFormatter
             Column { Text("De la idea al trabajo hecho",fontWeight=FontWeight.SemiBold,fontSize=14.sp); Text("Registra, mide y sigue avanzando.",color=Muted,style=MaterialTheme.typography.bodySmall) }
         }
         Text("Inicia sesión",style=MaterialTheme.typography.titleLarge)
-        if(vm.auth.isLocal) Text("MODO LOCAL · Cuentas y horas en este celular",color=Mint,style=MaterialTheme.typography.bodySmall)
+        Text("MODO LOCAL · Cuentas y horas en este celular",color=Mint,style=MaterialTheme.typography.bodySmall)
         Field(email,{email=it},"Correo electrónico",placeholder="nombre@empresa.com",keyboard=KeyboardType.Email,error=if (submitted) errors.email else null,leading="mail")
         Field(password,{password=it},"Contraseña",placeholder="Introduce tu contraseña",keyboard=KeyboardType.Password,error=if (submitted) errors.password else null,
             leading="lock",visual=if(reveal) VisualTransformation.None else PasswordVisualTransformation(),
             trailing={ PasswordEye(reveal) { reveal = !reveal } })
-        if(!vm.auth.isLocal) TextButton({reset=true},Modifier.align(Alignment.End),contentPadding=PaddingValues(0.dp)) { Text("¿Olvidaste tu contraseña?",color=Mint) }
         Primary(
             text = if (vm.busy) "Iniciando sesión…" else "Iniciar sesión",
             icon = "next",
@@ -77,15 +68,7 @@ import java.time.format.DateTimeFormatter
             submitted=true
             if (errors.valid) vm.login(email, password)
         }
-        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(14.dp)) {
-            HorizontalDivider(Modifier.weight(1f),color=Line); Text("o continúa con",color=Muted,style=MaterialTheme.typography.bodySmall); HorizontalDivider(Modifier.weight(1f),color=Line)
-        }
-        // Google intentionally appears after email, password and the primary sign-in button.
-        OutlinedButton({vm.google(context)},Modifier.fillMaxWidth().heightIn(min=54.dp),enabled=!vm.busy && vm.auth.googleConfigured,shape=RoundedCornerShape(15.dp),colors=ButtonDefaults.outlinedButtonColors(containerColor=Color.White,contentColor=Color(0xFF242424))) {
-            Text("G",fontWeight=FontWeight.Bold,fontSize=21.sp,color=Color(0xFF4285F4)); Spacer(Modifier.width(12.dp)); Text("Iniciar sesión con Google")
-        }
-        if(!vm.auth.googleConfigured) Text("Google estará disponible al configurar el acceso en la nube.",color=Muted,style=MaterialTheme.typography.bodySmall)
-        if(vm.auth.isLocal) TextButton({register=true},Modifier.align(Alignment.CenterHorizontally),enabled=!vm.busy) {Text("¿Primera vez? Crear cuenta local",color=Mint)}
+        TextButton({register=true},Modifier.align(Alignment.CenterHorizontally),enabled=!vm.busy) {Text("¿Primera vez? Crear cuenta local",color=Mint)}
         TextButton({demo=true},Modifier.align(Alignment.CenterHorizontally),enabled=!vm.busy) { Text("Explorar demostración",color=Muted) }
         Text("Tu sesión se mantiene en este dispositivo.",Modifier.align(Alignment.CenterHorizontally),style=MaterialTheme.typography.bodySmall,color=Muted)
     }
@@ -93,33 +76,7 @@ import java.time.format.DateTimeFormatter
     if(demo) AlertDialog(onDismissRequest={demo=false},title={Text("Prueba Deepsource")},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
         Text("Datos de ejemplo, guardados localmente. El perfil que elijas se mantiene hasta cerrar sesión.")
         Primary("Entrar como Luis · DEV",enabled=!vm.busy) { demo=false; vm.demo() }
-        Secondary("Entrar como Ana · LEADER",enabled=!vm.busy) { demo=false; vm.demo(true) }
     }},confirmButton={TextButton({demo=false}) {Text("Cancelar")}})
-    if (reset) {
-        var resetSubmitted by remember { mutableStateOf(false) }
-        val emailError = validateEmail(email)
-        AlertDialog(
-            onDismissRequest = { reset = false },
-            title = { Text("Recuperar contraseña") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Te enviaremos un enlace al correo de tu cuenta.", color = Muted)
-                    Field(email, { email = it }, "Correo electrónico", keyboard = KeyboardType.Email,
-                        error = if (resetSubmitted) emailError else null)
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    resetSubmitted = true
-                    if (validateEmail(email) == null) {
-                        reset = false
-                        vm.resetPassword(email)
-                    }
-                }, enabled = !vm.busy) { Text("Enviar enlace") }
-            },
-            dismissButton = { TextButton({ reset = false }) { Text("Cancelar") } }
-        )
-    }
 }
 
 @Composable private fun RegisterDialog(vm:AppViewModel,onDismiss:()->Unit) {
@@ -186,7 +143,6 @@ import java.time.format.DateTimeFormatter
         item { Section("Registros recientes","Ver todos") {vm.screen="history"} }
         if(vm.records.isEmpty()) item {EmptyState("Todavía no registras horas","Tu primer registro aparecerá aquí.")}
         else items(vm.records.take(3),key={it.id}) {EntryCard(it,vm.projects.firstOrNull {p->p.id==it.projectId}) {vm.openEntry(it)}}
-        if(session.role=="LEADER") item {Secondary("Ver resumen del equipo","team") {vm.screen="team"}}
         item { Text("Hecho para mantener tu enfoque.",Modifier.fillMaxWidth().padding(top=4.dp),color=Muted,style=MaterialTheme.typography.bodySmall,textAlign=androidx.compose.ui.text.style.TextAlign.Center) }
     }
 }
@@ -231,33 +187,24 @@ import java.time.format.DateTimeFormatter
     }
 }
 
-@Composable fun SummaryScreen(vm:AppViewModel,team:Boolean) {
-    val entries=(if(team) vm.teamRecords else vm.records).inMonth(vm.month)
+@Composable fun SummaryScreen(vm:AppViewModel) {
+    val entries=vm.records.inMonth(vm.month)
     val total=entries.totalSeconds()
-    val estimate=vm.projects.sumOf {if(team) it.teamEstimateMinutes else it.estimateMinutes}
+    val estimate=vm.projects.sumOf {it.estimateMinutes}
     val percent=deviation(total,estimate)
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
         item {Identity(vm.session!!)}
         item {MonthSelector(vm.month) {vm.month=it}}
         item { PanelCard {
-            Text(if(team) "HORAS DEL EQUIPO" else "MIS HORAS",color=Muted,style=MaterialTheme.typography.labelSmall)
+            Text("MIS HORAS",color=Muted,style=MaterialTheme.typography.labelSmall)
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {Text(durationText(total),style=MaterialTheme.typography.headlineLarge,fontSize=36.sp); Text("de ${durationText(estimate*60L)} estimadas",color=Muted,style=MaterialTheme.typography.bodySmall)}
                 if(percent!=null) Column(horizontalAlignment=Alignment.End) {Text("${if(percent>0) "+" else ""}$percent %",fontSize=24.sp,fontWeight=FontWeight.Bold,color=if(percent>0) Danger else Mint);Text(if(total>estimate*60L) "Sobre estimación" else "Dentro de estimación",color=Muted,fontSize=10.sp)}
             }
         } }
-        item {Section(if(team) "Balance por proyecto" else "Registradas frente a estimadas")}
+        item {Section("Registradas frente a estimadas")}
         if(vm.projects.isEmpty()) item {EmptyState("Aún no hay proyectos","Crea un proyecto desde Inicio.","chart")}
-        items(vm.projects,key={it.id}) {p -> BalanceCard(p,entries.totalSeconds(p.id),if(team) p.teamEstimateMinutes else p.estimateMinutes)}
-        if(team) {
-            item {Section("Desglose del equipo")}
-            items(vm.projects,key={"team_${it.id}"}) {p -> PanelCard {
-                Text(p.name,color=Color(p.color),fontWeight=FontWeight.SemiBold)
-                val members=entries.filter {it.projectId==p.id}.groupBy {it.uid}
-                if(members.isEmpty()) Text("Sin registros en este período",color=Muted)
-                members.values.forEach {rows -> Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {Text(rows.first().userName,color=Muted);Text(durationText(rows.sumOf {it.seconds}),fontWeight=FontWeight.SemiBold)} }
-            } }
-        }
+        items(vm.projects,key={it.id}) {p -> BalanceCard(p,entries.totalSeconds(p.id),p.estimateMinutes)}
         item {Text("Las estimaciones se comparan con las horas del mes seleccionado. El porcentaje indica desviación de tiempo, no avance de tareas.",color=Muted,style=MaterialTheme.typography.bodySmall)}
     }
 }
@@ -284,25 +231,11 @@ import java.time.format.DateTimeFormatter
     var project by rememberSaveable {mutableStateOf<String?>(null)}
     var picker by remember {mutableStateOf(false)}
     val rows=vm.records.inMonth(vm.month).filter { (project==null || it.projectId==project) && (it.task.contains(search,true) || vm.projects.firstOrNull {p->p.id==it.projectId}?.name?.contains(search,true)==true) }
-    val context=LocalContext.current
-    val scope=rememberCoroutineScope()
-    val csv=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
-        if(uri!=null) scope.launch {
-            runCatching { withContext(Dispatchers.IO) {
-                context.contentResolver.openOutputStream(uri)?.bufferedWriter(Charsets.UTF_8)?.use { out ->
-                    out.write(exportHoursCsv(rows,vm.projects,vm.session?.email.orEmpty()))
-                } ?: error("No pudimos abrir el archivo")
-            }}.onSuccess {vm.message="Archivo CSV exportado"}.onFailure {vm.message="No pudimos exportar el archivo"}
-        }
-    }
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
         item {MonthSelector(vm.month) {vm.month=it}}
         item {Field(search,{search=it},"Buscar registros",placeholder="Tarea o proyecto",leading="search")}
         item {SelectField("Proyecto",vm.projects.firstOrNull {it.id==project}?.name ?: "Todos los proyectos") {picker=true}}
-        item {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-            Text("${rows.size} registros · ${durationText(rows.totalSeconds())}",color=Muted,fontSize=12.sp)
-            TextButton({csv.launch("deepsource-${vm.month}.csv")},enabled=rows.isNotEmpty()) {Glyph("download",Modifier.size(17.dp));Spacer(Modifier.width(6.dp));Text("Exportar")}
-        }}
+        item { Text("${rows.size} registros · ${durationText(rows.totalSeconds())}",color=Muted,fontSize=12.sp) }
         if(rows.isEmpty()) item {EmptyState("Sin registros para esta búsqueda","Prueba otro mes o proyecto.","search")}
         items(rows,key={it.id}) {e ->EntryCard(e,vm.projects.firstOrNull {it.id==e.projectId}) {vm.openEntry(e)}}
         item {Primary("Nuevo registro","plus") {vm.openEntry()}}

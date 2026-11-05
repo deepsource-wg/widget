@@ -12,7 +12,6 @@ import java.io.Closeable
 internal data class HoursSnapshot(
     val projects: List<Project>,
     val entries: List<TimeEntry>,
-    val teamEntries: List<TimeEntry>,
     val timer: RunningTimer?
 )
 
@@ -23,7 +22,6 @@ internal class HoursRepository(context: Context) : Closeable {
         HoursSnapshot(
             projects = store.projects(session),
             entries = store.entries(session),
-            teamEntries = if (session.role == "LEADER") store.entries(session, team = true) else emptyList(),
             timer = store.timer(session)
         )
     }

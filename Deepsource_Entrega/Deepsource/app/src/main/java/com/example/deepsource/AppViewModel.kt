@@ -1,7 +1,6 @@
 package com.example.deepsource
 
 import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.SystemClock
@@ -26,11 +25,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val hours = HoursRepository(application)
     private val photos = ProfilePhotos(application)
     private val vault = SessionVault(application)
-    val auth = AuthRepository(application)
+    private val auth = AuthRepository(application)
     var session by mutableStateOf<Session?>(null); private set
     var projects by mutableStateOf<List<Project>>(emptyList()); private set
     var records by mutableStateOf<List<TimeEntry>>(emptyList()); private set
-    var teamRecords by mutableStateOf<List<TimeEntry>>(emptyList()); private set
     var timer by mutableStateOf<RunningTimer?>(null); private set
     var profilePhoto by mutableStateOf<Bitmap?>(null); private set
     var photoBusy by mutableStateOf(false); private set
@@ -65,19 +63,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun refresh() = action { reload(); updateWidgets() }
     private suspend fun reload() {
         val s = session
-        if(s==null) { projects=emptyList(); records=emptyList(); teamRecords=emptyList(); timer=null; return }
+        if(s==null) { projects=emptyList(); records=emptyList(); timer=null; return }
         val result = hours.read(s)
         projects = result.projects
         records = result.entries
         timer = result.timer
-        teamRecords = result.teamEntries
     }
     private fun action(block: suspend () -> Unit) {
         if(busy) return
         busy=true
         viewModelScope.launch {
             try { block() }
-            catch(_: AuthCancelled) { message="Acceso con Google cancelado" }
             catch(e: CancellationException) { throw e }
             catch(e: Exception) { message=e.message ?: "No pudimos completar la acción. Inténtalo de nuevo" }
             finally { busy=false }
@@ -114,14 +110,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         message = "Contraseña actualizada"
         onUpdated()
     }
-    fun google(context: Context) = action { acceptSession(auth.google(context)) }
-    fun demo(leader: Boolean = false) = action {
-        val s = if(leader) Session("demo_ana","Ana Pérez","ana.perez@deepsource.demo","LEADER",true,"Demostración")
-            else Session("demo_luis","Luis Gómez","luis.gomez@deepsource.demo","DEV",true,"Demostración")
-        acceptSession(s)
-    }
-    fun resetPassword(email: String) = action {
-        auth.resetPassword(email); message="Si el correo está registrado, recibirás un enlace para recuperar tu contraseña"
+    fun demo() = action {
+        acceptSession(Session("demo_luis","Luis Gómez","luis.gomez@deepsource.demo","DEV",true,"Demostración"))
     }
     fun profile(name: String) = action {
         val nameError = validateName(name)
@@ -174,7 +164,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
         profilePhoto = null
         session=null; reload(); screen="home"; editing=null; selectedProject=null; lastSaved=null
-        updateWidgets(); auth.signOut()
+        updateWidgets()
     }
     fun openEntry(entry: TimeEntry? = null, project: String? = null) { editing=entry; selectedProject=project ?: entry?.projectId; screen="entry" }
     fun save(project: String, day: LocalDate, seconds: Long, task: String) = action {

@@ -69,15 +69,14 @@ fun Glyph(name: String, modifier: Modifier = Modifier, tint: Color = LocalConten
             "home" -> { line(3f,10f,12f,3f); line(12f,3f,21f,10f); line(5f,9f,5f,21f); line(19f,9f,19f,21f); line(5f,21f,19f,21f); box(10f,14f,4f,7f,0f) }
             "chart" -> { line(4f,20f,21f,20f); line(6f,16f,6f,11f); line(12f,16f,12f,5f); line(18f,16f,18f,8f) }
             "history" -> { box(5f,3f,14f,18f); line(8f,8f,16f,8f); line(8f,12f,16f,12f); line(8f,16f,13f,16f) }
-            "person","team" -> { drawCircle(tint,3.3f*s,p(12f,7f),style=Stroke(1.7f*s)); drawArc(tint,180f,180f,false,p(5f,13f),Size(14*s,12*s),style=Stroke(1.7f*s)); if(name=="team") { line(20f,12f,22f,15f); line(22f,15f,22f,20f) } }
+            "widget" -> { box(3f,3f,8f,8f); box(14f,3f,7f,8f); box(3f,14f,8f,7f); box(14f,14f,7f,7f) }
+            "person" -> { drawCircle(tint,3.3f*s,p(12f,7f),style=Stroke(1.7f*s)); drawArc(tint,180f,180f,false,p(5f,13f),Size(14*s,12*s),style=Stroke(1.7f*s)) }
             "calendar" -> { box(3f,5f,18f,16f); line(3f,10f,21f,10f); line(8f,3f,8f,7f); line(16f,3f,16f,7f); line(8f,14f,10f,14f); line(14f,14f,16f,14f) }
             "search" -> { drawCircle(tint,6.5f*s,p(10f,10f),style=Stroke(1.7f*s)); line(15f,15f,21f,21f) }
             "mail" -> { box(3f,5f,18f,14f); line(3f,6f,12f,13f); line(12f,13f,21f,6f) }
             "lock" -> { box(5f,10f,14f,11f); drawArc(tint,180f,180f,false,p(8f,2f),Size(8*s,13*s),style=Stroke(1.7f*s)); line(12f,14f,12f,17f) }
             "eye" -> { drawOval(tint,p(2f,6f),Size(20*s,12*s),style=Stroke(1.7f*s)); drawCircle(tint,3f*s,p(12f,12f),style=Stroke(1.7f*s)) }
-            "widget" -> { box(3f,3f,8f,8f); box(14f,3f,7f,8f); box(3f,14f,8f,7f); box(14f,14f,7f,7f) }
             "edit" -> { line(5f,16f,16f,5f); line(8f,19f,19f,8f); line(16f,5f,19f,8f); line(5f,16f,4f,20f); line(4f,20f,8f,19f) }
-            "download" -> { line(12f,3f,12f,16f); line(7f,11f,12f,16f); line(12f,16f,17f,11f); line(4f,17f,4f,21f); line(4f,21f,20f,21f); line(20f,21f,20f,17f) }
             "logout" -> { box(3f,3f,9f,18f); line(10f,12f,22f,12f); line(17f,7f,22f,12f); line(22f,12f,17f,17f) }
             "trash" -> { line(4f,6f,20f,6f); box(6f,6f,12f,15f); line(9f,3f,15f,3f); line(10f,10f,10f,17f); line(14f,10f,14f,17f) }
             else -> { box(3f,3f,18f,18f,5f); line(8f,16f,8f,10f); line(12f,16f,12f,7f); line(16f,16f,16f,12f) }

@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                     Row(Modifier.fillMaxWidth().background(Ink).statusBarsPadding().heightIn(min=66.dp).padding(horizontal=20.dp, vertical=4.dp),verticalAlignment=Alignment.CenterVertically) {
                         if(vm.screen=="home") Brand(true) else {
                             if(!showNav) IconButton({vm.screen="home"}, Modifier.semantics { contentDescription = "Volver al inicio" }) { Glyph("back") }
-                            Text(when(vm.screen) { "summary"->"Resumen de horas"; "history"->"Mis registros"; "widget"->"Tu widget"; "profile"->"Mi perfil"; "entry"->if(vm.editing==null) "Registrar horas" else "Editar registro"; "timer"->"Cronómetro"; "team"->"Resumen del equipo"; "project"->"Detalle del proyecto"; else->"Deepsource" },style=MaterialTheme.typography.titleLarge)
+                            Text(when(vm.screen) { "summary"->"Resumen de horas"; "history"->"Mis registros"; "widget"->"Tu widget"; "profile"->"Mi perfil"; "entry"->if(vm.editing==null) "Registrar horas" else "Editar registro"; "timer"->"Cronómetro"; "project"->"Detalle del proyecto"; else->"Deepsource" },style=MaterialTheme.typography.titleLarge)
                         }
                         Spacer(Modifier.weight(1f))
                         if(vm.screen=="home") IconButton({vm.screen="profile"}, Modifier.semantics { contentDescription = "Abrir perfil" }) { Avatar(vm.session!!, 36, vm.profilePhoto) }
@@ -81,8 +81,7 @@ class MainActivity : ComponentActivity() {
                         vm.session==null -> LoginScreen(vm)
                         else -> when(vm.screen) {
                             "home" -> HomeScreen(vm)
-                            "summary" -> SummaryScreen(vm,false)
-                            "team" -> if(vm.session!!.role=="LEADER") SummaryScreen(vm,true) else HomeScreen(vm)
+                            "summary" -> SummaryScreen(vm)
                             "history" -> HistoryScreen(vm)
                             "entry" -> EntryScreen(vm)
                             "timer" -> TimerScreen(vm)

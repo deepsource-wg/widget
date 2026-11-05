@@ -15,8 +15,6 @@ android {
         targetSdk = 37
         versionCode = 5
         versionName = "1.4"
-        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${providers.gradleProperty("GOOGLE_WEB_CLIENT_ID").orElse("").get()}\"")
-        buildConfigField("String", "FIREBASE_API_KEY", "\"${providers.gradleProperty("FIREBASE_API_KEY").orElse("").get()}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,11 +23,6 @@ android {
         create("local") {
             dimension = "backend"
             isDefault = true
-            buildConfigField("boolean", "USE_FIREBASE", "false")
-        }
-        create("cloud") {
-            dimension = "backend"
-            buildConfigField("boolean", "USE_FIREBASE", "true")
         }
     }
 
@@ -52,9 +45,6 @@ android {
 }
 
 dependencies {
-    "cloudImplementation"("androidx.credentials:credentials:1.5.0")
-    "cloudImplementation"("androidx.credentials:credentials-play-services-auth:1.5.0")
-    "cloudImplementation"("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.animation)

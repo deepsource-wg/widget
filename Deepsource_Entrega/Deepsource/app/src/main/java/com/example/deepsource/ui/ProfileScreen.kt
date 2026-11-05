@@ -46,7 +46,7 @@ import com.example.deepsource.ui.theme.Muted
             if (nameError == null) vm.profile(name)
         }
         PanelCard {Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {Glyph("lock",tint=Mint);Column {Text("Sesión protegida",fontWeight=FontWeight.SemiBold);Text("Método de acceso: ${s.provider}",color=Muted,style=MaterialTheme.typography.bodySmall)}}}
-        if(vm.auth.isLocal && !s.demo) Secondary("Cambiar contraseña","lock",!vm.busy) {changePassword=true}
+        if(!s.demo) Secondary("Cambiar contraseña","lock",!vm.busy) {changePassword=true}
         Secondary("Cerrar sesión","logout",!vm.busy && !vm.photoBusy) {logout=true}
         Text("Deepsource · ${BuildConfig.VERSION_NAME}\nTus registros se guardan en este dispositivo.",Modifier.fillMaxWidth(),color=Muted,style=MaterialTheme.typography.bodySmall,textAlign=androidx.compose.ui.text.style.TextAlign.Center)
     }

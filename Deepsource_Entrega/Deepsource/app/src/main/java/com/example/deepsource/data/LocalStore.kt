@@ -28,11 +28,9 @@ class LocalStore(context: Context) : SQLiteOpenHelper(context, "deepsource.db", 
             c.getLong(c.getColumnIndexOrThrow("color")))) }
     }
 
-    fun entries(session: Session, team: Boolean = false): List<TimeEntry> {
-        require(!team || session.role == "LEADER") { "Esta vista requiere un perfil de líder" }
-        val where = if (team) "p.workspace=?" else "e.uid=? AND p.workspace=?"
-        val args = if (team) arrayOf(session.workspace) else arrayOf(session.uid, session.workspace)
-        return readableDatabase.rawQuery("SELECT e.* FROM entries e JOIN projects p ON p.id=e.project_id WHERE $where ORDER BY e.day DESC,e.id DESC", args).use { c ->
+    fun entries(session: Session): List<TimeEntry> {
+        val args = arrayOf(session.uid, session.workspace)
+        return readableDatabase.rawQuery("SELECT e.* FROM entries e JOIN projects p ON p.id=e.project_id WHERE e.uid=? AND p.workspace=? ORDER BY e.day DESC,e.id DESC", args).use { c ->
             buildList { while(c.moveToNext()) add(TimeEntry(c.getLong(0),c.getString(1),c.getString(2),
                 c.getString(3),LocalDate.parse(c.getString(4)),c.getLong(5),c.getString(6),c.getString(7))) }
         }
