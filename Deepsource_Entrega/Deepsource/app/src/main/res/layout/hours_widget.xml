@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_background" android:orientation="vertical" android:padding="16dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="deepsource" android:textSize="17sp" android:textStyle="bold" android:textColor="#F7F4FF" />
+        <ImageView android:id="@+id/widget_timer_button" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:src="@drawable/widget_clock" android:contentDescription="Abrir cronómetro" />
+        <ImageView android:id="@+id/widget_refresh" android:layout_width="48dp" android:layout_height="48dp" android:padding="12dp" android:src="@drawable/widget_refresh" android:contentDescription="Actualizar widget" />
+    </LinearLayout>
+    <TextView android:id="@+id/widget_month" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="TUS HORAS · ESTE MES" android:textColor="#ADA5C1" android:textSize="9sp" android:letterSpacing="0.08" android:layout_marginTop="4dp" />
+    <TextView android:id="@+id/widget_total" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="0 h" android:textColor="#F7F4FF" android:textSize="28sp" android:textStyle="bold" android:layout_marginTop="4dp" />
+    <TextView android:id="@+id/widget_message" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Inicia sesión para ver tus horas" android:textColor="#C3BAD5" android:textSize="12sp" android:paddingVertical="8dp" android:visibility="gone" />
+    <LinearLayout android:id="@+id/widget_row1" style="@style/WidgetRow"><TextView android:id="@+id/widget_name1" style="@style/WidgetName" android:text="Portal Cliente AFC" /><TextView android:id="@+id/widget_hours1" style="@style/WidgetHours" android:text="24 h" /></LinearLayout>
+    <LinearLayout android:id="@+id/widget_row2" style="@style/WidgetRow"><TextView android:id="@+id/widget_name2" style="@style/WidgetName" android:text="Rediseño Web" /><TextView android:id="@+id/widget_hours2" style="@style/WidgetHours" android:text="38 h" /></LinearLayout>
+    <LinearLayout android:id="@+id/widget_row3" style="@style/WidgetRow"><TextView android:id="@+id/widget_name3" style="@style/WidgetName" android:text="Dashboard Admin" /><TextView android:id="@+id/widget_hours3" style="@style/WidgetHours" android:text="12 h" /></LinearLayout>
+    <LinearLayout android:id="@+id/widget_row4" style="@style/WidgetRow"><TextView android:id="@+id/widget_name4" style="@style/WidgetName" android:text="API Integración" /><TextView android:id="@+id/widget_hours4" style="@style/WidgetHours" android:text="7 h" /></LinearLayout>
+    <LinearLayout android:id="@+id/widget_active" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:gravity="center_vertical" android:visibility="gone">
+        <TextView android:id="@+id/widget_timer_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="EN MARCHA" android:textColor="#25D9BC" android:textSize="8sp" />
+        <Chronometer android:id="@+id/widget_chronometer" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:textColor="#F7F4FF" android:textSize="16sp" android:fontFamily="monospace" />
+        <TextView android:id="@+id/widget_toggle" android:layout_width="72dp" android:layout_height="48dp" android:gravity="center" android:text="Pausar" android:textColor="#25D9BC" android:textSize="11sp" android:background="@drawable/widget_chip" />
+    </LinearLayout>
+    <TextView android:id="@+id/widget_manual" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center" android:text="+ Registrar horas" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="12sp" android:background="@drawable/widget_button" android:layout_marginTop="10dp" />
+    <TextView android:id="@+id/widget_updated" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Deepsource · Tus horas por proyecto" android:textColor="#ADA5C1" android:textSize="9sp" android:layout_marginTop="8dp" android:maxLines="1" android:ellipsize="end" />
+</LinearLayout>
